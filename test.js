@@ -57,4 +57,19 @@ describe('registry-auth-token', function () {
       done()
     })
   })
+
+  it('should fetch for the registry given (if defined)', function (done) {
+    var content = [
+      '//registry.foobar.eu:_authToken=barbaz',
+      '//registry.blah.foo:_authToken=whatev',
+      '//registry.last.thing:_authToken=yep', ''
+    ].join('\n')
+
+    fs.writeFile(npmRcPath, content, function (err) {
+      var getAuthToken = requireUncached('./index')
+      assert(!err, err)
+      assert.equal(getAuthToken('//registry.blah.foo'), 'whatev')
+      done()
+    })
+  })
 })
