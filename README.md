@@ -20,6 +20,12 @@ console.log(getAuthToken())
 
 // Get auth token for a specific registry URL
 console.log(getAuthToken('//registry.foo.bar'))
+
+// Find the registry auth token for a given URL (with deep path):
+// If registry is at `//some.host/registry`
+// URL passed is `//some.host/registry/deep/path`
+// Will find token the closest matching path; `//some.host/registry`
+console.log(getAuthToken('//some.host/registry/deep/path', {recursive: true}))
 ```
 
 ## Security

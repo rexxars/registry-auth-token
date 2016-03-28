@@ -1,9 +1,28 @@
+var path = require('path')
+var url = require('url')
 var tokenKey = ':_authToken'
 
-module.exports = function (registryUrl) {
+module.exports = function (registryUrl, opts) {
+  var options = opts || {}
   var npmrc = require('rc')('npm', {registry: 'https://registry.npmjs.org/'})
-  var url = (registryUrl || npmrc.registry).replace(/^https?:/i, '')
-  var urlAlt = url.slice(-1) === '/' ? url : url + '/'
+  var parsed = url.parse(registryUrl || npmrc.registry, false, true)
 
-  return npmrc[url + tokenKey] || npmrc[urlAlt + tokenKey]
+  var match
+  var pathname
+
+  while (!match && pathname !== '/') {
+    pathname = parsed.pathname || '/'
+    var regUrl = '//' + parsed.hostname + pathname.replace(/\/$/, '')
+    var urlAlt = regUrl.slice(-1) === '/' ? regUrl : regUrl + '/'
+
+    match = npmrc[regUrl + tokenKey] || npmrc[urlAlt + tokenKey]
+
+    if (!options.recursive) {
+      return match
+    }
+
+    parsed.pathname = path.resolve(pathname, '..')
+  }
+
+  return match
 }

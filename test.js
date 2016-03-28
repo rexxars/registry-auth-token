@@ -72,4 +72,21 @@ describe('registry-auth-token', function () {
       done()
     })
   })
+
+  it('recursively finds registries for deep url if option is set', function (done, undef) {
+    var opts = {recursive: true}
+    var content = [
+      '//registry.blah.com/foo:_authToken=whatev',
+      '//registry.blah.eu:_authToken=yep', ''
+    ].join('\n')
+
+    fs.writeFile(npmRcPath, content, function (err) {
+      var getAuthToken = requireUncached('./index')
+      assert(!err, err)
+      assert.equal(getAuthToken('https://registry.blah.com/foo/bar/baz', opts), 'whatev')
+      assert.equal(getAuthToken('http://registry.blah.eu/what/ever', opts), 'yep')
+      assert.equal(getAuthToken('//some.registry', opts), undef)
+      done()
+    })
+  })
 })
