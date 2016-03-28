@@ -1,0 +1,60 @@
+var fs = require('fs')
+var path = require('path')
+var mocha = require('mocha')
+var assert = require('assert')
+var requireUncached = require('require-uncached')
+
+var npmRcPath = path.join(__dirname, '.npmrc')
+var afterEach = mocha.afterEach
+var describe = mocha.describe
+var it = mocha.it
+
+describe('registry-auth-token', function () {
+  afterEach(function (done) {
+    fs.unlink(npmRcPath, function () {
+      done()
+    })
+  })
+
+  it('should read global if no local is found', function () {
+    var getAuthToken = requireUncached('./index')
+    getAuthToken()
+  })
+
+  it('should return undefined if no auth token is given for registry', function (done) {
+    fs.writeFile(npmRcPath, 'registry=http://registry.npmjs.eu/', function (err) {
+      var getAuthToken = requireUncached('./index')
+      assert(!err, err)
+      assert(!getAuthToken())
+      done()
+    })
+  })
+
+  it('should return auth token if registry is defined', function (done) {
+    var content = [
+      'registry=http://registry.foobar.eu/',
+      '//registry.foobar.eu/:_authToken=foobar', ''
+    ].join('\n')
+
+    fs.writeFile(npmRcPath, content, function (err) {
+      var getAuthToken = requireUncached('./index')
+      assert(!err, err)
+      assert.equal(getAuthToken(), 'foobar')
+      done()
+    })
+  })
+
+  it('should try with and without a slash at the end of registry url', function (done) {
+    var content = [
+      'registry=http://registry.foobar.eu',
+      '//registry.foobar.eu:_authToken=barbaz', ''
+    ].join('\n')
+
+    fs.writeFile(npmRcPath, content, function (err) {
+      var getAuthToken = requireUncached('./index')
+      assert(!err, err)
+      assert.equal(getAuthToken(), 'barbaz')
+      done()
+    })
+  })
+})

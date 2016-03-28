@@ -1,0 +1,11 @@
+{
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "no-var": 0,
+    "prefer-template": 0,
+    "prefer-arrow-callback": 0
+  },
+  "extends": "bengler"
+}
