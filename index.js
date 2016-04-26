@@ -12,7 +12,7 @@ module.exports = function (registryUrl, opts) {
 
   while (!match && pathname !== '/') {
     pathname = parsed.pathname || '/'
-    var regUrl = '//' + parsed.hostname + pathname.replace(/\/$/, '')
+    var regUrl = '//' + parsed.host + pathname.replace(/\/$/, '')
     var urlAlt = regUrl.slice(-1) === '/' ? regUrl : regUrl + '/'
 
     match = npmrc[regUrl + tokenKey] || npmrc[urlAlt + tokenKey]
