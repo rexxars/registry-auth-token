@@ -44,6 +44,22 @@ describe('registry-auth-token', function () {
     })
   })
 
+  it('should return auth token if registry url has port specified', function (done) {
+    var content = [
+      'registry=http://localhost:8770/',
+      // before the patch this token was selected.
+      '//localhost/:_authToken=ohno',
+      '//localhost:8770/:_authToken=beepboop', ''
+    ].join('\n')
+
+    fs.writeFile(npmRcPath, content, function (err) {
+      var getAuthToken = requireUncached('./index')
+      assert(!err, err)
+      assert.equal(getAuthToken(), 'beepboop')
+      done()
+    })
+  })
+
   it('should try with and without a slash at the end of registry url', function (done) {
     var content = [
       'registry=http://registry.foobar.eu',
