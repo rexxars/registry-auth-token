@@ -18,8 +18,8 @@ module.exports = function (registryUrl, opts) {
     match = npmrc[regUrl + tokenKey] || npmrc[urlAlt + tokenKey]
 
     if (match) {
-      match = match.replace(/^\$(\{)?([^}]*)\}?$/, function ($0, $1, $2, index, input) {
-        return process.env[$2]
+      match = match.replace(/^\$\{?([^}]*)\}?$/, function (fullMatch, envVar) {
+        return process.env[envVar]
       })
     }
 
