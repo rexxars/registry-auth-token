@@ -4,12 +4,12 @@ var mocha = require('mocha')
 var assert = require('assert')
 var requireUncached = require('require-uncached')
 
-var npmRcPath = path.join(__dirname, '.npmrc')
+var npmRcPath = path.join(__dirname, '..', '.npmrc')
 var afterEach = mocha.afterEach
 var describe = mocha.describe
 var it = mocha.it
 
-describe('registry-auth-token', function () {
+describe('auth-token', function () {
   afterEach(function (done) {
     fs.unlink(npmRcPath, function () {
       done()
@@ -17,13 +17,13 @@ describe('registry-auth-token', function () {
   })
 
   it('should read global if no local is found', function () {
-    var getAuthToken = requireUncached('./index')
+    var getAuthToken = requireUncached('../index')
     getAuthToken()
   })
 
   it('should return undefined if no auth token is given for registry', function (done) {
     fs.writeFile(npmRcPath, 'registry=http://registry.npmjs.eu/', function (err) {
-      var getAuthToken = requireUncached('./index')
+      var getAuthToken = requireUncached('../index')
       assert(!err, err)
       assert(!getAuthToken())
       done()
@@ -37,7 +37,7 @@ describe('registry-auth-token', function () {
     ].join('\n')
 
     fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('./index')
+      var getAuthToken = requireUncached('../index')
       assert(!err, err)
       assert.equal(getAuthToken(), 'foobar')
       done()
@@ -53,7 +53,7 @@ describe('registry-auth-token', function () {
     ].join('\n')
 
     fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('./index')
+      var getAuthToken = requireUncached('../index')
       assert(!err, err)
       assert.equal(getAuthToken(), 'beepboop')
       done()
@@ -69,7 +69,7 @@ describe('registry-auth-token', function () {
     process.env[environmentVariable] = 'foobar'
 
     fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('./index')
+      var getAuthToken = requireUncached('../index')
       assert(!err, err)
       assert.equal(getAuthToken(), 'foobar')
       delete process.env[environmentVariable]
@@ -86,7 +86,7 @@ describe('registry-auth-token', function () {
     process.env[environmentVariable] = 'foobar'
 
     fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('./index')
+      var getAuthToken = requireUncached('../index')
       assert(!err, err)
       assert.equal(getAuthToken(), 'foobar')
       delete process.env[environmentVariable]
@@ -101,7 +101,7 @@ describe('registry-auth-token', function () {
     ].join('\n')
 
     fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('./index')
+      var getAuthToken = requireUncached('../index')
       assert(!err, err)
       assert.equal(getAuthToken(), 'barbaz')
       done()
@@ -116,7 +116,7 @@ describe('registry-auth-token', function () {
     ].join('\n')
 
     fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('./index')
+      var getAuthToken = requireUncached('../index')
       assert(!err, err)
       assert.equal(getAuthToken('//registry.blah.foo'), 'whatev')
       done()
@@ -131,11 +131,20 @@ describe('registry-auth-token', function () {
     ].join('\n')
 
     fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('./index')
+      var getAuthToken = requireUncached('../index')
       assert(!err, err)
       assert.equal(getAuthToken('https://registry.blah.com/foo/bar/baz', opts), 'whatev')
       assert.equal(getAuthToken('http://registry.blah.eu/what/ever', opts), 'yep')
       assert.equal(getAuthToken('//some.registry', opts), undef)
+      done()
+    })
+  })
+
+  it('should try both with and without trailing slash', function (done) {
+    fs.writeFile(npmRcPath, '//registry.blah.com:_authToken=whatev', function (err) {
+      var getAuthToken = requireUncached('../index')
+      assert(!err, err)
+      assert.equal(getAuthToken('https://registry.blah.com'), 'whatev')
       done()
     })
   })

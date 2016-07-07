@@ -13,9 +13,7 @@ module.exports = function (registryUrl, opts) {
   while (!match && pathname !== '/') {
     pathname = parsed.pathname || '/'
     var regUrl = '//' + parsed.host + pathname.replace(/\/$/, '')
-    var urlAlt = regUrl.slice(-1) === '/' ? regUrl : regUrl + '/'
-
-    match = npmrc[regUrl + tokenKey] || npmrc[urlAlt + tokenKey]
+    match = npmrc[regUrl + tokenKey] || npmrc[regUrl + '/' + tokenKey]
 
     if (match) {
       match = match.replace(/^\$\{?([^}]*)\}?$/, function (fullMatch, envVar) {
