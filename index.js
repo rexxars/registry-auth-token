@@ -1,4 +1,3 @@
-var path = require('path')
 var url = require('url')
 var tokenKey = ':_authToken'
 
@@ -25,7 +24,7 @@ module.exports = function (registryUrl, opts) {
       return match
     }
 
-    parsed.pathname = path.resolve(pathname, '..')
+    parsed.pathname = url.resolve(pathname, '..')
   }
 
   return match
