@@ -2,6 +2,22 @@
 
 All notable changes will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- Support for Basic Authentication (username/password)
+
+### Changes
+
+- The result format of the output changed from a simple string to an object which contains the token type
+
+```javascript
+  // before: returns 'tokenString'
+  // after: returns {token: 'tokenString', type: 'Bearer'}
+  getAuthToken()
+```
+
 ## [2.1.1] - 2016-07-10
 
 ### Changes
