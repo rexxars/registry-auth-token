@@ -22,7 +22,7 @@ describe('registry-url', function () {
   })
 
   it('should return default registry if no url is given for scope', function (done) {
-    fs.writeFile(npmRcPath, 'spin=false', function (err) {
+    fs.writeFile(npmRcPath, 'registry=https://registry.npmjs.org/', function (err) {
       var getRegistryUrl = requireUncached('../registry-url')
       assert(!err, err)
       assert.equal(getRegistryUrl('@somescope'), 'https://registry.npmjs.org/')

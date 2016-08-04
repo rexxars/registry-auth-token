@@ -9,6 +9,16 @@ var afterEach = mocha.afterEach
 var describe = mocha.describe
 var it = mocha.it
 
+function decodeBase64(base64) {
+  return new Buffer(base64, 'base64').toString()
+}
+
+function encodeBase64(string) {
+  return new Buffer(string, 'utf8').toString('base64')
+}
+
+/*eslint max-nested-callbacks: ["error", 4]*/
+
 describe('auth-token', function () {
   afterEach(function (done) {
     fs.unlink(npmRcPath, function () {
@@ -30,122 +40,256 @@ describe('auth-token', function () {
     })
   })
 
-  it('should return auth token if registry is defined', function (done) {
-    var content = [
-      'registry=http://registry.foobar.eu/',
-      '//registry.foobar.eu/:_authToken=foobar', ''
-    ].join('\n')
+  describe('bearer token', function () {
 
-    fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('../index')
-      assert(!err, err)
-      assert.equal(getAuthToken(), 'foobar')
-      done()
+    it('should return auth token if registry is defined', function (done) {
+      var content = [
+        'registry=http://registry.foobar.eu/',
+        '//registry.foobar.eu/:_authToken=foobar', ''
+      ].join('\n')
+
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        assert.deepEqual(getAuthToken(), {token: 'foobar', type: 'Bearer'})
+        done()
+      })
     })
+
+    it('should return auth token if registry url has port specified', function (done) {
+      var content = [
+        'registry=http://localhost:8770/',
+        // before the patch this token was selected.
+        '//localhost/:_authToken=ohno',
+        '//localhost:8770/:_authToken=beepboop', ''
+      ].join('\n')
+
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        assert.deepEqual(getAuthToken(), {token: 'beepboop', type: 'Bearer'})
+        done()
+      })
+    })
+
+    it('should return auth token defined by reference to an environment variable (with curly braces)', function (done) {
+      var environmentVariable = '__REGISTRY_AUTH_TOKEN_NPM_TOKEN__'
+      var content = [
+        'registry=http://registry.foobar.cc/',
+        '//registry.foobar.cc/:_authToken=${' + environmentVariable + '}', ''
+      ].join('\n')
+      process.env[environmentVariable] = 'foobar'
+
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        assert.deepEqual(getAuthToken(), {token: 'foobar', type: 'Bearer'})
+        delete process.env[environmentVariable]
+        done()
+      })
+    })
+
+    it('should return auth token defined by reference to an environment variable (without curly braces)', function (done) {
+      var environmentVariable = '__REGISTRY_AUTH_TOKEN_NPM_TOKEN__'
+      var content = [
+        'registry=http://registry.foobar.cc/',
+        '//registry.foobar.cc/:_authToken=$' + environmentVariable, ''
+      ].join('\n')
+      process.env[environmentVariable] = 'foobar'
+
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        assert.deepEqual(getAuthToken(), {token: 'foobar', type: 'Bearer'})
+        delete process.env[environmentVariable]
+        done()
+      })
+    })
+
+    it('should try with and without a slash at the end of registry url', function (done) {
+      var content = [
+        'registry=http://registry.foobar.eu',
+        '//registry.foobar.eu:_authToken=barbaz', ''
+      ].join('\n')
+
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        assert.deepEqual(getAuthToken(), {token: 'barbaz', type: 'Bearer'})
+        done()
+      })
+    })
+
+    it('should fetch for the registry given (if defined)', function (done) {
+      var content = [
+        '//registry.foobar.eu:_authToken=barbaz',
+        '//registry.blah.foo:_authToken=whatev',
+        '//registry.last.thing:_authToken=yep', ''
+      ].join('\n')
+
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        assert.deepEqual(getAuthToken('//registry.blah.foo'), {token: 'whatev', type: 'Bearer'})
+        done()
+      })
+    })
+
+    it('recursively finds registries for deep url if option is set', function (done, undef) {
+      var opts = {recursive: true}
+      var content = [
+        '//registry.blah.com/foo:_authToken=whatev',
+        '//registry.blah.eu:_authToken=yep', ''
+      ].join('\n')
+
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        assert.deepEqual(getAuthToken('https://registry.blah.com/foo/bar/baz', opts), {token: 'whatev', type: 'Bearer'})
+        assert.deepEqual(getAuthToken('http://registry.blah.eu/what/ever', opts), {token: 'yep', type: 'Bearer'})
+        assert.equal(getAuthToken('//some.registry', opts), undef)
+        done()
+      })
+    })
+
+    it('should try both with and without trailing slash', function (done) {
+      fs.writeFile(npmRcPath, '//registry.blah.com:_authToken=whatev', function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        assert.deepEqual(getAuthToken('https://registry.blah.com'), {token: 'whatev', type: 'Bearer'})
+        done()
+      })
+    })
+
+    it('should prefer bearer token over basic token', function (done) {
+      var content = [
+        'registry=http://registry.foobar.eu/',
+        'registry=http://registry.foobar.eu/',
+        '//registry.foobar.eu/:_authToken=bearerToken',
+        '//registry.foobar.eu/:_password=' + encodeBase64('foobar'),
+        '//registry.foobar.eu/:username=foobar', ''
+      ].join('\n')
+
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        assert.deepEqual(getAuthToken('//registry.foobar.eu'), {token: 'bearerToken', type: 'Bearer'})
+        done()
+      })
+    })
+
   })
 
-  it('should return auth token if registry url has port specified', function (done) {
-    var content = [
-      'registry=http://localhost:8770/',
-      // before the patch this token was selected.
-      '//localhost/:_authToken=ohno',
-      '//localhost:8770/:_authToken=beepboop', ''
-    ].join('\n')
+  describe('basic token', function () {
 
-    fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('../index')
-      assert(!err, err)
-      assert.equal(getAuthToken(), 'beepboop')
-      done()
+    it('should return undefined if password or username are missing', function (done, undef) {
+      var content = [
+        'registry=http://registry.foobar.eu/',
+        '//registry.foobar.eu/:_password=' + encodeBase64('foobar'),
+        '//registry.foobar.com/:username=foobar', ''
+      ].join('\n')
+
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        assert.equal(getAuthToken('//registry.foobar.eu'), undef)
+        assert.equal(getAuthToken('//registry.foobar.com'), undef)
+        done()
+      })
     })
-  })
 
-  it('should return auth token defined by reference to an environment variable (with curly braces)', function (done) {
-    var environmentVariable = '__REGISTRY_AUTH_TOKEN_NPM_TOKEN__'
-    var content = [
-      'registry=http://registry.foobar.cc/',
-      '//registry.foobar.cc/:_authToken=${' + environmentVariable + '}', ''
-    ].join('\n')
-    process.env[environmentVariable] = 'foobar'
+    it('should return basic token if username and password are defined', function (done) {
+      var content = [
+        'registry=http://registry.foobar.eu/',
+        '//registry.foobar.eu/:_password=' + encodeBase64('foobar'),
+        '//registry.foobar.eu/:username=foobar', ''
+      ].join('\n')
 
-    fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('../index')
-      assert(!err, err)
-      assert.equal(getAuthToken(), 'foobar')
-      delete process.env[environmentVariable]
-      done()
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        var token = getAuthToken()
+        assert.deepEqual(token, {token: 'Zm9vYmFyOmZvb2Jhcg==', type: 'Basic'})
+        assert.equal(decodeBase64(token.token), 'foobar:foobar')
+        done()
+      })
     })
-  })
 
-  it('should return auth token defined by reference to an environment variable (without curly braces)', function (done) {
-    var environmentVariable = '__REGISTRY_AUTH_TOKEN_NPM_TOKEN__'
-    var content = [
-      'registry=http://registry.foobar.cc/',
-      '//registry.foobar.cc/:_authToken=$' + environmentVariable, ''
-    ].join('\n')
-    process.env[environmentVariable] = 'foobar'
+    it('should return basic token if registry url has port specified', function (done) {
+      var content = [
+        'registry=http://localhost:8770/',
+        // before the patch this token was selected.
+        '//localhost/:_authToken=ohno',
+        '//localhost:8770/:_password=' + encodeBase64('foobar'),
+        '//localhost:8770/:username=foobar', ''
+      ].join('\n')
 
-    fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('../index')
-      assert(!err, err)
-      assert.equal(getAuthToken(), 'foobar')
-      delete process.env[environmentVariable]
-      done()
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        var token = getAuthToken()
+        assert.deepEqual(token, {token: 'Zm9vYmFyOmZvb2Jhcg==', type: 'Basic'})
+        assert.equal(decodeBase64(token.token), 'foobar:foobar')
+        done()
+      })
     })
-  })
 
-  it('should try with and without a slash at the end of registry url', function (done) {
-    var content = [
-      'registry=http://registry.foobar.eu',
-      '//registry.foobar.eu:_authToken=barbaz', ''
-    ].join('\n')
+    it('should try with and without a slash at the end of registry url', function (done) {
+      var content = [
+        'registry=http://registry.foobar.eu',
+        '//registry.foobar.eu:_password=' + encodeBase64('barbay'),
+        '//registry.foobar.eu:username=barbaz', ''
+      ].join('\n')
 
-    fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('../index')
-      assert(!err, err)
-      assert.equal(getAuthToken(), 'barbaz')
-      done()
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        var token = getAuthToken()
+        assert.deepEqual(token, {token: 'YmFyYmF6OmJhcmJheQ==', type: 'Basic'})
+        assert.equal(decodeBase64(token.token), 'barbaz:barbay')
+        done()
+      })
     })
-  })
 
-  it('should fetch for the registry given (if defined)', function (done) {
-    var content = [
-      '//registry.foobar.eu:_authToken=barbaz',
-      '//registry.blah.foo:_authToken=whatev',
-      '//registry.last.thing:_authToken=yep', ''
-    ].join('\n')
+    it('should fetch for the registry given (if defined)', function (done) {
+      var content = [
+        '//registry.foobar.eu:_authToken=barbaz',
+        '//registry.blah.foo:_password=' + encodeBase64('barbay'),
+        '//registry.blah.foo:username=barbaz',
+        '//registry.last.thing:_authToken=yep', ''
+      ].join('\n')
 
-    fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('../index')
-      assert(!err, err)
-      assert.equal(getAuthToken('//registry.blah.foo'), 'whatev')
-      done()
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        var token = getAuthToken('//registry.blah.foo')
+        assert.deepEqual(token, {token: 'YmFyYmF6OmJhcmJheQ==', type: 'Basic'})
+        assert.equal(decodeBase64(token.token), 'barbaz:barbay')
+        done()
+      })
     })
-  })
 
-  it('recursively finds registries for deep url if option is set', function (done, undef) {
-    var opts = {recursive: true}
-    var content = [
-      '//registry.blah.com/foo:_authToken=whatev',
-      '//registry.blah.eu:_authToken=yep', ''
-    ].join('\n')
+    it('recursively finds registries for deep url if option is set', function (done, undef) {
+      var opts = {recursive: true}
+      var content = [
+        '//registry.blah.com/foo:_password=' + encodeBase64('barbay'),
+        '//registry.blah.com/foo:username=barbaz',
+        '//registry.blah.eu:username=barbaz',
+        '//registry.blah.eu:_password=' + encodeBase64('foobaz'), ''
+      ].join('\n')
 
-    fs.writeFile(npmRcPath, content, function (err) {
-      var getAuthToken = requireUncached('../index')
-      assert(!err, err)
-      assert.equal(getAuthToken('https://registry.blah.com/foo/bar/baz', opts), 'whatev')
-      assert.equal(getAuthToken('http://registry.blah.eu/what/ever', opts), 'yep')
-      assert.equal(getAuthToken('//some.registry', opts), undef)
-      done()
-    })
-  })
-
-  it('should try both with and without trailing slash', function (done) {
-    fs.writeFile(npmRcPath, '//registry.blah.com:_authToken=whatev', function (err) {
-      var getAuthToken = requireUncached('../index')
-      assert(!err, err)
-      assert.equal(getAuthToken('https://registry.blah.com'), 'whatev')
-      done()
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        var token = getAuthToken('https://registry.blah.com/foo/bar/baz', opts)
+        assert.deepEqual(token, {token: 'YmFyYmF6OmJhcmJheQ==', type: 'Basic'})
+        assert.equal(decodeBase64(token.token), 'barbaz:barbay')
+        token = getAuthToken('https://registry.blah.eu/foo/bar/baz', opts)
+        assert.deepEqual(token, {token: 'YmFyYmF6OmZvb2Jheg==', type: 'Basic'})
+        assert.equal(decodeBase64(token.token), 'barbaz:foobaz')
+        assert.equal(getAuthToken('//some.registry', opts), undef)
+        done()
+      })
     })
   })
 })
