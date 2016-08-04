@@ -8,12 +8,14 @@ module.exports = function (registryUrl, opts) {
   var npmrc = require('rc')('npm', {registry: 'https://registry.npmjs.org/'})
   var parsed = url.parse(registryUrl || npmrc.registry, false, true)
 
-  var pathname
+  var pathname = parsed.pathname || '/'
   var token
   var type
 
-  while (pathname !== '/') {
-    pathname = parsed.pathname || '/'
+  do {
+
+    pathname = url.resolve(pathname, '..')
+
     var regUrl = '//' + parsed.host + pathname.replace(/\/$/, '')
 
     // try to get bearer token
@@ -54,8 +56,7 @@ module.exports = function (registryUrl, opts) {
       break
     }
 
-    parsed.pathname = url.resolve(pathname, '..')
-  }
+  } while (pathname !== '/')
 
   if (token !== undefined) {
     return {token: token, type: type}
