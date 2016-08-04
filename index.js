@@ -12,20 +12,30 @@ module.exports = function (registryUrl, opts) {
   while (!match && pathname !== '/') {
     pathname = parsed.pathname || '/'
     var regUrl = '//' + parsed.host + pathname.replace(/\/$/, '')
+
+    // try to get bearer token
     match = npmrc[regUrl + tokenKey] || npmrc[regUrl + '/' + tokenKey]
 
     if (match) {
+      // check if bearer token
       match = match.replace(/^\$\{?([^}]*)\}?$/, function (fullMatch, envVar) {
         return process.env[envVar]
       })
+      // we found a bearer token so let's exit the loop
+      break
     }
 
     if (!options.recursive) {
-      return match
+      break
     }
 
     parsed.pathname = url.resolve(pathname, '..')
   }
 
-  return match
+  if (match !== undefined) {
+    return {token: match, type: 'Bearer'}
+  }
+
+
+  return undefined
 }
