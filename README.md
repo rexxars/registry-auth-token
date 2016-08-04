@@ -12,12 +12,14 @@ npm install --save registry-auth-token
 
 ## Usage
 
+Returns an object containing `token` and `type`, or `undefined` if no token can be found. `type` can be either `Bearer` or `Basic`.
+
 ```js
 var getAuthToken = require('registry-auth-token')
 var getRegistryUrl = require('registry-auth-token/registry-url')
 
-// Get auth token for default `registry` set in `.npmrc`
-console.log(getAuthToken())
+// Get auth token and type for default `registry` set in `.npmrc`
+console.log(getAuthToken()) // {token: 'someToken', type: 'Bearer'}
 
 // Get auth token for a specific registry URL
 console.log(getAuthToken('//registry.foo.bar'))
@@ -31,6 +33,19 @@ console.log(getAuthToken('//some.host/registry/deep/path', {recursive: true}))
 // Find the configured registry url for scope `@foobar`.
 // Falls back to the global registry if not defined.
 console.log(getRegistryUrl('@foobar'))
+```
+
+## Return value
+
+```js
+// If auth info can be found:
+{token: 'someToken', type: 'Bearer'}
+
+// Or:
+{token: 'someOtherToken', type: 'Basic'}
+
+// Or, if nothing is found:
+undefined
 ```
 
 ## Security
