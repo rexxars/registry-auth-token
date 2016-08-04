@@ -60,5 +60,5 @@ module.exports = function (registryUrl, opts) {
     return {token: token, type: type}
   }
 
-  return void 0
+  return undefined
 }
