@@ -13,8 +13,7 @@ module.exports = function (registryUrl, opts) {
   var type
 
   do {
-
-    pathname = url.resolve(pathname, '..')
+    pathname = url.resolve(pathname, '..') || '/'
 
     var regUrl = '//' + parsed.host + pathname.replace(/\/$/, '')
 
@@ -55,12 +54,11 @@ module.exports = function (registryUrl, opts) {
     if (!options.recursive) {
       break
     }
-
   } while (pathname !== '/')
 
-  if (token !== undefined) {
+  if (typeof token !== 'undefined') {
     return {token: token, type: type}
   }
 
-  return undefined
+  return void 0
 }
