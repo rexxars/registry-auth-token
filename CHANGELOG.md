@@ -2,17 +2,17 @@
 
 All notable changes will be documented in this file.
 
-## [Unreleased]
+## [3.0.0] - 2016-08-04
 
 ### Added
 
-- Support for Basic Authentication (username/password)
+- Support for Basic Authentication (username/password) (Lukas Eipert)
 
 ### Changes
 
 - The result format of the output changed from a simple string to an object which contains the token type
 
-```javascript
+```js
   // before: returns 'tokenString'
   // after: returns {token: 'tokenString', type: 'Bearer'}
   getAuthToken()
@@ -46,3 +46,4 @@ All notable changes will be documented in this file.
 [2.0.0]: https://github.com/rexxars/registry-auth-token/compare/v1.1.1...v2.0.0
 [2.1.0]: https://github.com/rexxars/registry-auth-token/compare/v2.0.0...v2.1.0
 [2.1.1]: https://github.com/rexxars/registry-auth-token/compare/v2.1.0...v2.1.1
+[3.0.0]: https://github.com/rexxars/registry-auth-token/compare/v2.1.1...v3.0.0
