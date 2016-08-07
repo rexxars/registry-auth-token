@@ -1,5 +1,4 @@
 var url = require('url')
-var path = require('path')
 var tokenKey = ':_authToken'
 var userKey = ':username'
 var passwordKey = ':_password'
@@ -24,10 +23,14 @@ module.exports = function getRegistryAuthInfo(registryUrl, opts) {
       return undefined
     }
 
-    parsed.pathname = path.dirname(pathname, '..') || '/'
+    parsed.pathname = url.resolve(normalizePath(pathname), '..') || '/'
   }
 
   return undefined
+}
+
+function normalizePath(path) {
+  return path[path.length - 1] === '/' ? path : path + '/'
 }
 
 function getAuthInfoForUrl(regUrl, npmrc) {
