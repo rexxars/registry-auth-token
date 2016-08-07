@@ -139,12 +139,16 @@ describe('auth-token', function () {
       var opts = {recursive: true}
       var content = [
         '//registry.blah.com/foo:_authToken=whatev',
+        '//registry.blah.org/foo/bar:_authToken=recurseExactlyOneLevel',
+        '//registry.blah.edu/foo/bar/baz:_authToken=recurseNoLevel',
         '//registry.blah.eu:_authToken=yep', ''
       ].join('\n')
 
       fs.writeFile(npmRcPath, content, function (err) {
         var getAuthToken = requireUncached('../index')
         assert(!err, err)
+        assert.deepEqual(getAuthToken('https://registry.blah.edu/foo/bar/baz', opts), {token: 'recurseNoLevel', type: 'Bearer'})
+        assert.deepEqual(getAuthToken('https://registry.blah.org/foo/bar/baz', opts), {token: 'recurseExactlyOneLevel', type: 'Bearer'})
         assert.deepEqual(getAuthToken('https://registry.blah.com/foo/bar/baz', opts), {token: 'whatev', type: 'Bearer'})
         assert.deepEqual(getAuthToken('http://registry.blah.eu/what/ever', opts), {token: 'yep', type: 'Bearer'})
         assert.equal(getAuthToken('//some.registry', opts), undef)
