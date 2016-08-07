@@ -1,12 +1,12 @@
 var url = require('url')
+var base64 = require('./base64')
+
+var decodeBase64 = base64.decodeBase64
+var encodeBase64 = base64.encodeBase64
 
 var tokenKey = ':_authToken'
 var userKey = ':username'
 var passwordKey = ':_password'
-
-var base64 = require('./base64')
-var decodeBase64 = base64.decodeBase64
-var encodeBase64 = base64.encodeBase64
 
 module.exports = function getRegistryAuthInfo(registryUrl, opts) {
   var options = opts || {}
