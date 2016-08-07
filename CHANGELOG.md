@@ -2,6 +2,13 @@
 
 All notable changes will be documented in this file.
 
+## [3.0.1] - 2016-08-07
+
+### Changes
+
+- Fix recursion bug (Lukas Eipert)
+- Implement alternative base64 encoding/decoding implementation for Node 6 (Lukas Eipert)
+
 ## [3.0.0] - 2016-08-04
 
 ### Added
