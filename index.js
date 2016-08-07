@@ -1,7 +1,12 @@
 var url = require('url')
+
 var tokenKey = ':_authToken'
 var userKey = ':username'
 var passwordKey = ':_password'
+
+var base64 = require('./base64')
+var decodeBase64 = base64.decodeBase64
+var encodeBase64 = base64.encodeBase64
 
 module.exports = function getRegistryAuthInfo(registryUrl, opts) {
   var options = opts || {}
@@ -71,11 +76,11 @@ function getTokenForUsernameAndPassword(username, password) {
 
   // passwords are base64 encoded, so we need to decode it
   // See https://github.com/npm/npm/blob/v3.10.6/lib/config/set-credentials-by-uri.js#L26
-  var pass = new Buffer(password, 'base64').toString('utf8')
+  var pass = decodeBase64(password)
 
   // a basic auth token is base64 encoded 'username:password'
   // See https://github.com/npm/npm/blob/v3.10.6/lib/config/get-credentials-by-uri.js#L70
-  var token = new Buffer(username + ':' + pass).toString('base64')
+  var token = encodeBase64(username + ':' + pass)
 
   // we found a basicToken token so let's exit the loop
   return {token: token, type: 'Basic'}

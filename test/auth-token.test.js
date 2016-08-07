@@ -9,13 +9,9 @@ var afterEach = mocha.afterEach
 var describe = mocha.describe
 var it = mocha.it
 
-function decodeBase64(base64) {
-  return new Buffer(base64, 'base64').toString()
-}
-
-function encodeBase64(string) {
-  return new Buffer(string, 'utf8').toString('base64')
-}
+var base64 = require('../base64')
+var decodeBase64 = base64.decodeBase64
+var encodeBase64 = base64.encodeBase64
 
 /*eslint max-nested-callbacks: ["error", 4]*/
 
