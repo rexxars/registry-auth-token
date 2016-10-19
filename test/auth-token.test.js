@@ -209,7 +209,12 @@ describe('auth-token', function () {
         var getAuthToken = requireUncached('../index')
         assert(!err, err)
         var token = getAuthToken()
-        assert.deepEqual(token, {token: 'Zm9vYmFyOmZvb2Jhcg==', type: 'Basic'})
+        assert.deepEqual(token, {
+          token: 'Zm9vYmFyOmZvb2Jhcg==',
+          type: 'Basic',
+          username: 'foobar',
+          password: 'foobar'
+        })
         assert.equal(decodeBase64(token.token), 'foobar:foobar')
         done()
       })
@@ -228,7 +233,12 @@ describe('auth-token', function () {
         var getAuthToken = requireUncached('../index')
         assert(!err, err)
         var token = getAuthToken()
-        assert.deepEqual(token, {token: 'Zm9vYmFyOmZvb2Jhcg==', type: 'Basic'})
+        assert.deepEqual(token, {
+          token: 'Zm9vYmFyOmZvb2Jhcg==',
+          type: 'Basic',
+          username: 'foobar',
+          password: 'foobar'
+        })
         assert.equal(decodeBase64(token.token), 'foobar:foobar')
         done()
       })
@@ -245,7 +255,12 @@ describe('auth-token', function () {
         var getAuthToken = requireUncached('../index')
         assert(!err, err)
         var token = getAuthToken()
-        assert.deepEqual(token, {token: 'YmFyYmF6OmJhcmJheQ==', type: 'Basic'})
+        assert.deepEqual(token, {
+          token: 'YmFyYmF6OmJhcmJheQ==',
+          type: 'Basic',
+          password: 'barbay',
+          username: 'barbaz'
+        })
         assert.equal(decodeBase64(token.token), 'barbaz:barbay')
         done()
       })
@@ -263,7 +278,12 @@ describe('auth-token', function () {
         var getAuthToken = requireUncached('../index')
         assert(!err, err)
         var token = getAuthToken('//registry.blah.foo')
-        assert.deepEqual(token, {token: 'YmFyYmF6OmJhcmJheQ==', type: 'Basic'})
+        assert.deepEqual(token, {
+          token: 'YmFyYmF6OmJhcmJheQ==',
+          type: 'Basic',
+          password: 'barbay',
+          username: 'barbaz'
+        })
         assert.equal(decodeBase64(token.token), 'barbaz:barbay')
         done()
       })
@@ -282,10 +302,20 @@ describe('auth-token', function () {
         var getAuthToken = requireUncached('../index')
         assert(!err, err)
         var token = getAuthToken('https://registry.blah.com/foo/bar/baz', opts)
-        assert.deepEqual(token, {token: 'YmFyYmF6OmJhcmJheQ==', type: 'Basic'})
+        assert.deepEqual(token, {
+          token: 'YmFyYmF6OmJhcmJheQ==',
+          type: 'Basic',
+          password: 'barbay',
+          username: 'barbaz'
+        })
         assert.equal(decodeBase64(token.token), 'barbaz:barbay')
         token = getAuthToken('https://registry.blah.eu/foo/bar/baz', opts)
-        assert.deepEqual(token, {token: 'YmFyYmF6OmZvb2Jheg==', type: 'Basic'})
+        assert.deepEqual(token, {
+          token: 'YmFyYmF6OmZvb2Jheg==',
+          type: 'Basic',
+          password: 'foobaz',
+          username: 'barbaz'
+        })
         assert.equal(decodeBase64(token.token), 'barbaz:foobaz')
         assert.equal(getAuthToken('//some.registry', opts), undef)
         done()
