@@ -83,5 +83,10 @@ function getTokenForUsernameAndPassword(username, password) {
   var token = encodeBase64(username + ':' + pass)
 
   // we found a basicToken token so let's exit the loop
-  return {token: token, type: 'Basic'}
+  return {
+    token: token,
+    type: 'Basic',
+    password: pass,
+    username: username
+  }
 }
