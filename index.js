@@ -25,7 +25,7 @@ module.exports = function () {
   return getRegistryAuthInfo(checkUrl, options) || getLegacyAuthInfo(options.npmrc)
 }
 
-function getRegistryAuthInfo(checkUrl, options) {
+function getRegistryAuthInfo (checkUrl, options) {
   var parsed = url.parse(checkUrl, false, true)
   var pathname
 
@@ -51,18 +51,18 @@ function getRegistryAuthInfo(checkUrl, options) {
   return undefined
 }
 
-function getLegacyAuthInfo(npmrc) {
+function getLegacyAuthInfo (npmrc) {
   if (npmrc._auth) {
     return getBearerToken(npmrc._auth)
   }
   return undefined
 }
 
-function normalizePath(path) {
+function normalizePath (path) {
   return path[path.length - 1] === '/' ? path : path + '/'
 }
 
-function getAuthInfoForUrl(regUrl, npmrc) {
+function getAuthInfoForUrl (regUrl, npmrc) {
   // try to get bearer token
   var bearerAuth = getBearerToken(npmrc[regUrl + tokenKey] || npmrc[regUrl + '/' + tokenKey])
   if (bearerAuth) {
@@ -80,7 +80,7 @@ function getAuthInfoForUrl(regUrl, npmrc) {
   return undefined
 }
 
-function getBearerToken(tok) {
+function getBearerToken (tok) {
   if (!tok) {
     return undefined
   }
@@ -93,7 +93,7 @@ function getBearerToken(tok) {
   return {token: token, type: 'Bearer'}
 }
 
-function getTokenForUsernameAndPassword(username, password) {
+function getTokenForUsernameAndPassword (username, password) {
   if (!username || !password) {
     return undefined
   }

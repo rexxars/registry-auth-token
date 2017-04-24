@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "posttest": "eslint .",
+    "posttest": "standard",
     "coverage": "istanbul cover _mocha"
   },
   "repository": {
@@ -29,13 +29,18 @@
   },
   "homepage": "https://github.com/rexxars/registry-auth-token#readme",
   "dependencies": {
-    "rc": "^1.1.6"
+    "rc": "^1.1.6",
+    "safe-buffer": "^5.0.1"
   },
   "devDependencies": {
-    "eslint": "^2.4.0",
-    "eslint-config-bengler": "^1.0.7",
     "istanbul": "^0.4.2",
-    "mocha": "^2.4.5",
-    "require-uncached": "^1.0.2"
+    "mocha": "^3.3.0",
+    "require-uncached": "^1.0.2",
+    "standard": "^10.0.2"
+  },
+  "standard": {
+    "ignore": [
+      "coverage/**"
+    ]
   }
 }

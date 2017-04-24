@@ -13,7 +13,7 @@ var base64 = require('../base64')
 var decodeBase64 = base64.decodeBase64
 var encodeBase64 = base64.encodeBase64
 
-/*eslint max-nested-callbacks: ["error", 4]*/
+/* eslint max-nested-callbacks: ["error", 4] */
 
 describe('auth-token', function () {
   afterEach(function (done) {
@@ -37,7 +37,6 @@ describe('auth-token', function () {
   })
 
   describe('bearer token', function () {
-
     it('should return auth token if registry is defined', function (done) {
       var content = [
         'registry=http://registry.foobar.eu/',
@@ -55,7 +54,7 @@ describe('auth-token', function () {
     it('should return auth token if it is defined in the legacy way via the `_auth` key', function (done) {
       var content = [
         '_auth=foobar',
-        'registry=http://registry.foobar.eu/',
+        'registry=http://registry.foobar.eu/'
       ].join('\n')
 
       fs.writeFile(npmRcPath, content, function (err) {
@@ -225,7 +224,6 @@ describe('auth-token', function () {
   })
 
   describe('basic token', function () {
-
     it('should return undefined if password or username are missing', function (done, undef) {
       var content = [
         'registry=http://registry.foobar.eu/',

@@ -9,3 +9,7 @@ coverage
 
 # Dependency directories
 node_modules
+
+# Yarn lockfile
+yarn.lock
+
