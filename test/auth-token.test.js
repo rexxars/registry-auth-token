@@ -52,6 +52,20 @@ describe('auth-token', function () {
       })
     })
 
+    it('should return auth token if it is defined in the legacy way via the `_auth` key', function (done) {
+      var content = [
+        '_auth=foobar',
+        'registry=http://registry.foobar.eu/',
+      ].join('\n')
+
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        assert.deepEqual(getAuthToken(), {token: 'foobar', type: 'Bearer'})
+        done()
+      })
+    })
+
     it('should use npmrc passed in', function (done) {
       var content = [
         'registry=http://registry.foobar.eu/',

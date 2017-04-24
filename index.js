@@ -22,7 +22,7 @@ module.exports = function () {
   options = options || {}
   options.npmrc = options.npmrc || require('rc')('npm', {registry: 'https://registry.npmjs.org/'})
   checkUrl = checkUrl || options.npmrc.registry
-  return getRegistryAuthInfo(checkUrl, options)
+  return getRegistryAuthInfo(checkUrl, options) || getLegacyAuthInfo(options.npmrc)
 }
 
 function getRegistryAuthInfo(checkUrl, options) {
@@ -48,6 +48,13 @@ function getRegistryAuthInfo(checkUrl, options) {
     parsed.pathname = url.resolve(normalizePath(pathname), '..') || '/'
   }
 
+  return undefined
+}
+
+function getLegacyAuthInfo(npmrc) {
+  if (npmrc._auth) {
+    return getBearerToken(npmrc._auth)
+  }
   return undefined
 }
 
