@@ -264,6 +264,25 @@ describe('auth-token', function () {
       })
     })
 
+    it('should return basic token if _auth is base64 encoded', function (done) {
+      var content = [
+        'registry=http://registry.foobar.eu/',
+        '//registry.foobar.eu/:_auth=' + encodeBase64('foobar:foobar')
+      ].join('\n')
+
+      fs.writeFile(npmRcPath, content, function (err) {
+        var getAuthToken = requireUncached('../index')
+        assert(!err, err)
+        var token = getAuthToken()
+        assert.deepEqual(token, {
+          token: 'Zm9vYmFyOmZvb2Jhcg==',
+          type: 'Basic'
+        })
+        assert.equal(decodeBase64(token.token), 'foobar:foobar')
+        done()
+      })
+    })    
+    
     it('should return basic token if registry url has port specified', function (done) {
       var content = [
         'registry=http://localhost:8770/',
