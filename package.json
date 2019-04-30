@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/rexxars/registry-auth-token#readme",
   "dependencies": {
-    "rc": "^1.1.6",
+    "rc": "^1.2.8",
     "safe-buffer": "^5.0.1"
   },
   "devDependencies": {
