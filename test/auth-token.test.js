@@ -310,11 +310,11 @@ describe('auth-token', function () {
         var getAuthToken = requireUncached('../index')
         assert(!err, err)
         var token = getAuthToken()
-        assert.deepEqual(token, {
+        assert.deepStrictEqual(token, {
           token: 'Zm9vYmFyOmZvb2Jhcg==',
           type: 'Basic'
         })
-        assert.equal(decodeBase64(token.token), 'foobar:foobar')
+        assert.strictEqual(decodeBase64(token.token), 'foobar:foobar')
         done()
       })
     })
