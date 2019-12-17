@@ -128,7 +128,6 @@ function getTokenForUsernameAndPassword (username, password) {
   }
 }
 
-
 function getLegacyAuthToken (tok) {
   if (!tok) {
     return undefined

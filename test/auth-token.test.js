@@ -317,7 +317,7 @@ describe('auth-token', function () {
         assert.equal(decodeBase64(token.token), 'foobar:foobar')
         done()
       })
-    })  
+    })
 
     it('should return basic token if registry url has port specified', function (done) {
       var content = [
