@@ -30,16 +30,22 @@ console.log(getAuthToken('//registry.foo.bar'))
 // Will find token the closest matching path; `//some.host/registry`
 console.log(getAuthToken('//some.host/registry/deep/path', {recursive: true}))
 
+// Use the npm config that is passed in
+console.log(getAuthToken('//registry.foo.bar', {
+  npmrc: {
+    'registry': 'http://registry.foo.bar',
+    '//registry.foo.bar/:_authToken': 'qar'
+  }
+}))
+
 // Find the configured registry url for scope `@foobar`.
 // Falls back to the global registry if not defined.
 console.log(getRegistryUrl('@foobar'))
 
 // Use the npm config that is passed in
 console.log(getRegistryUrl('http://registry.foobar.eu/', {
-  npmrc: {
-    'registry': 'http://registry.foobar.eu/',
-    '//registry.foobar.eu/:_authToken': 'qar'
-  }
+  'registry': 'http://registry.foobar.eu/',
+  '//registry.foobar.eu/:_authToken': 'qar'
 }))
 ```
 
