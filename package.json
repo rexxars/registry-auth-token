@@ -13,7 +13,7 @@
     "url": "git+ssh://git@github.com/rexxars/registry-auth-token.git"
   },
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=12"
   },
   "keywords": [
     "npm",
@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/rexxars/registry-auth-token#readme",
   "dependencies": {
-    "rc": "^1.2.8"
+    "@pnpm/npm-conf": "^1.0.4"
   },
   "devDependencies": {
     "istanbul": "^0.4.2",

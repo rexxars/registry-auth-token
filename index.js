@@ -1,5 +1,6 @@
 var url = require('url')
 var base64 = require('./base64')
+var npmConf = require('@pnpm/npm-conf')
 
 var decodeBase64 = base64.decodeBase64
 var encodeBase64 = base64.encodeBase64
@@ -21,10 +22,8 @@ module.exports = function () {
     options = arguments[0]
   }
   options = options || {}
-  options.npmrc = options.npmrc || require('rc')('npm', { registry: 'https://registry.npmjs.org/' }, {
-    config: process.env.npm_config_userconfig || process.env.NPM_CONFIG_USERCONFIG
-  })
-  checkUrl = checkUrl || options.npmrc.registry
+  options.npmrc = options.npmrc ? { ...options.npmrc, get: (key) => options.npmrc[key] } : npmConf()
+  checkUrl = checkUrl || options.npmrc.get('registry')
   return getRegistryAuthInfo(checkUrl, options) || getLegacyAuthInfo(options.npmrc)
 }
 
@@ -55,11 +54,11 @@ function getRegistryAuthInfo (checkUrl, options) {
 }
 
 function getLegacyAuthInfo (npmrc) {
-  if (!npmrc._auth) {
+  if (!npmrc.get('_auth')) {
     return undefined
   }
 
-  var token = replaceEnvironmentVariable(npmrc._auth)
+  var token = replaceEnvironmentVariable(npmrc.get('_auth'))
 
   return { token: token, type: 'Basic' }
 }
@@ -70,20 +69,20 @@ function normalizePath (path) {
 
 function getAuthInfoForUrl (regUrl, npmrc) {
   // try to get bearer token
-  var bearerAuth = getBearerToken(npmrc[regUrl + tokenKey] || npmrc[regUrl + '/' + tokenKey])
+  var bearerAuth = getBearerToken(npmrc.get(regUrl + tokenKey) || npmrc.get(regUrl + '/' + tokenKey))
   if (bearerAuth) {
     return bearerAuth
   }
 
   // try to get basic token
-  var username = npmrc[regUrl + userKey] || npmrc[regUrl + '/' + userKey]
-  var password = npmrc[regUrl + passwordKey] || npmrc[regUrl + '/' + passwordKey]
+  var username = npmrc.get(regUrl + userKey) || npmrc.get(regUrl + '/' + userKey)
+  var password = npmrc.get(regUrl + passwordKey) || npmrc.get(regUrl + '/' + passwordKey)
   var basicAuth = getTokenForUsernameAndPassword(username, password)
   if (basicAuth) {
     return basicAuth
   }
 
-  var basicAuthWithToken = getLegacyAuthToken(npmrc[regUrl + legacyTokenKey] || npmrc[regUrl + '/' + legacyTokenKey])
+  var basicAuthWithToken = getLegacyAuthToken(npmrc.get(regUrl + legacyTokenKey) || npmrc.get(regUrl + '/' + legacyTokenKey))
   if (basicAuthWithToken) {
     return basicAuthWithToken
   }
