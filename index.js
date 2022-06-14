@@ -15,15 +15,18 @@ module.exports = function () {
   var options
   if (arguments.length >= 2) {
     checkUrl = arguments[0]
-    options = arguments[1]
+    options = Object.assign({}, arguments[1])
   } else if (typeof arguments[0] === 'string') {
     checkUrl = arguments[0]
   } else {
-    options = arguments[0]
+    options = Object.assign({}, arguments[0])
   }
   options = options || {}
-  options.npmrc = options.npmrc ? { ...options.npmrc, get: (key) => options.npmrc[key] } : npmConf()
-  checkUrl = checkUrl || options.npmrc.get('registry')
+  options.npmrc = options.npmrc ? {
+    ...options.npmrc,
+    get: (key) => options.npmrc[key]
+  } : npmConf()
+  checkUrl = checkUrl || options.npmrc.get('registry') || npmConf.defaults.registry
   return getRegistryAuthInfo(checkUrl, options) || getLegacyAuthInfo(options.npmrc)
 }
 
