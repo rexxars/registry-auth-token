@@ -1,5 +1,7 @@
+var npmConf = require('@pnpm/npm-conf')
+
 module.exports = function (scope, npmrc) {
-  var rc = npmrc ? { get: (key) => npmrc[key] } : require('@pnpm/npm-conf')();
-  var url = rc.get(scope + ':registry') || rc.get(registry)
+  var rc = npmrc ? { get: (key) => npmrc[key] } : npmConf()
+  var url = rc.get(scope + ':registry') || rc.get('registry') || npmConf.defaults.registry
   return url.slice(-1) === '/' ? url : url + '/'
 }
