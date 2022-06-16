@@ -15,8 +15,8 @@ npm install --save registry-auth-token
 Returns an object containing `token` and `type`, or `undefined` if no token can be found. `type` can be either `Bearer` or `Basic`.
 
 ```js
-var getAuthToken = require('registry-auth-token')
-var getRegistryUrl = require('registry-auth-token/registry-url')
+const getAuthToken = require('registry-auth-token')
+const getRegistryUrl = require('registry-auth-token/registry-url')
 
 // Get auth token and type for default `registry` set in `.npmrc`
 console.log(getAuthToken()) // {token: 'someToken', type: 'Bearer'}
