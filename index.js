@@ -1,18 +1,14 @@
-var url = require('url')
-var base64 = require('./base64')
-var npmConf = require('@pnpm/npm-conf')
+const url = require('url')
+const npmConf = require('@pnpm/npm-conf')
 
-var decodeBase64 = base64.decodeBase64
-var encodeBase64 = base64.encodeBase64
+const tokenKey = ':_authToken'
+const legacyTokenKey = ':_auth'
+const userKey = ':username'
+const passwordKey = ':_password'
 
-var tokenKey = ':_authToken'
-var legacyTokenKey = ':_auth'
-var userKey = ':username'
-var passwordKey = ':_password'
-
-module.exports = function () {
-  var checkUrl
-  var options
+module.exports = function getRegistryAuthToken () {
+  let checkUrl
+  let options
   if (arguments.length >= 2) {
     checkUrl = arguments[0]
     options = Object.assign({}, arguments[1])
@@ -31,14 +27,14 @@ module.exports = function () {
 }
 
 function getRegistryAuthInfo (checkUrl, options) {
-  var parsed = url.parse(checkUrl, false, true)
-  var pathname
+  const parsed = url.parse(checkUrl, false, true)
+  let pathname
 
   while (pathname !== '/' && parsed.pathname !== pathname) {
     pathname = parsed.pathname || '/'
 
-    var regUrl = '//' + parsed.host + pathname.replace(/\/$/, '')
-    var authInfo = getAuthInfoForUrl(regUrl, options.npmrc)
+    const regUrl = '//' + parsed.host + pathname.replace(/\/$/, '')
+    const authInfo = getAuthInfoForUrl(regUrl, options.npmrc)
     if (authInfo) {
       return authInfo
     }
@@ -61,7 +57,7 @@ function getLegacyAuthInfo (npmrc) {
     return undefined
   }
 
-  var token = replaceEnvironmentVariable(npmrc.get('_auth'))
+  const token = replaceEnvironmentVariable(npmrc.get('_auth'))
 
   return { token: token, type: 'Basic' }
 }
@@ -72,20 +68,20 @@ function normalizePath (path) {
 
 function getAuthInfoForUrl (regUrl, npmrc) {
   // try to get bearer token
-  var bearerAuth = getBearerToken(npmrc.get(regUrl + tokenKey) || npmrc.get(regUrl + '/' + tokenKey))
+  const bearerAuth = getBearerToken(npmrc.get(regUrl + tokenKey) || npmrc.get(regUrl + '/' + tokenKey))
   if (bearerAuth) {
     return bearerAuth
   }
 
   // try to get basic token
-  var username = npmrc.get(regUrl + userKey) || npmrc.get(regUrl + '/' + userKey)
-  var password = npmrc.get(regUrl + passwordKey) || npmrc.get(regUrl + '/' + passwordKey)
-  var basicAuth = getTokenForUsernameAndPassword(username, password)
+  const username = npmrc.get(regUrl + userKey) || npmrc.get(regUrl + '/' + userKey)
+  const password = npmrc.get(regUrl + passwordKey) || npmrc.get(regUrl + '/' + passwordKey)
+  const basicAuth = getTokenForUsernameAndPassword(username, password)
   if (basicAuth) {
     return basicAuth
   }
 
-  var basicAuthWithToken = getLegacyAuthToken(npmrc.get(regUrl + legacyTokenKey) || npmrc.get(regUrl + '/' + legacyTokenKey))
+  const basicAuthWithToken = getLegacyAuthToken(npmrc.get(regUrl + legacyTokenKey) || npmrc.get(regUrl + '/' + legacyTokenKey))
   if (basicAuthWithToken) {
     return basicAuthWithToken
   }
@@ -105,7 +101,7 @@ function getBearerToken (tok) {
   }
 
   // check if bearer token is set as environment variable
-  var token = replaceEnvironmentVariable(tok)
+  const token = replaceEnvironmentVariable(tok)
 
   return { token: token, type: 'Bearer' }
 }
@@ -117,11 +113,11 @@ function getTokenForUsernameAndPassword (username, password) {
 
   // passwords are base64 encoded, so we need to decode it
   // See https://github.com/npm/npm/blob/v3.10.6/lib/config/set-credentials-by-uri.js#L26
-  var pass = decodeBase64(replaceEnvironmentVariable(password))
+  const pass = Buffer.from(replaceEnvironmentVariable(password), 'base64').toString('utf8')
 
   // a basic auth token is base64 encoded 'username:password'
   // See https://github.com/npm/npm/blob/v3.10.6/lib/config/get-credentials-by-uri.js#L70
-  var token = encodeBase64(username + ':' + pass)
+  const token = Buffer.from(username + ':' + pass, 'utf8').toString('base64')
 
   // we found a basicToken token so let's exit the loop
   return {
@@ -138,7 +134,7 @@ function getLegacyAuthToken (tok) {
   }
 
   // check if legacy auth token is set as environment variable
-  var token = replaceEnvironmentVariable(tok)
+  const token = replaceEnvironmentVariable(tok)
 
   return { token: token, type: 'Basic' }
 }
