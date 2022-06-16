@@ -2,6 +2,22 @@
 
 All notable changes will be documented in this file.
 
+## [5.0.0] - 2022-06-16
+
+### BREAKING
+
+- Require node version 14 or above (Espen Hovlandsdal)
+
+### Added
+
+- Add typescript definitions (Espen Hovlandsdal)
+
+### Changes
+
+- Replace outdated `rc` dependency with `@pnpm/npm-conf` (Kyler Nelson)
+- Fix incorrect usage information in readme (Kyler Nelson)
+
+
 ## [4.2.2] - 2022-06-16
 
 ### Changes
