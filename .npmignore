@@ -1,7 +1,7 @@
 .editorconfig
 .eslintignore
 .eslintrc
-.travis.yml
+.github
 npm-debug.log
 coverage
 test
