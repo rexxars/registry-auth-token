@@ -1,7 +1,7 @@
 import { AuthOptions } from './';
 
 /**
- * Get the registry URL for a given npm scope. Falls back to global registry is scope is not defined.
+ * Get the registry URL for a given npm scope. Falls back to global registry if scope is not defined.
  *
  * @param [scope] - npm scope to resolve URL for. Falls back to global registry if not defined.
  * @param [npmrc] - Optional object of npmrc properties to use instead of looking up the users local npmrc file
