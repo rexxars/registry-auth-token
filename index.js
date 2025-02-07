@@ -1,4 +1,3 @@
-const url = require('url')
 const npmConf = require('@pnpm/npm-conf')
 
 const tokenKey = ':_authToken'
@@ -30,8 +29,22 @@ module.exports = function getRegistryAuthToken () {
   return getRegistryAuthInfo(checkUrl, options) || getLegacyAuthInfo(options.npmrc)
 }
 
+// https://nodejs.org/api/url.html#urlresolvefrom-to
+function urlResolve (from, to) {
+  const resolvedUrl = new URL(to, new URL(from.startsWith('//') ? `./${from}` : from, 'resolve://'))
+  if (resolvedUrl.protocol === 'resolve:') {
+    // `from` is a relative URL.
+    const { pathname, search, hash } = resolvedUrl
+    return pathname + search + hash
+  }
+  return resolvedUrl.toString()
+}
+
 function getRegistryAuthInfo (checkUrl, options) {
-  const parsed = url.parse(checkUrl, false, true)
+  let parsed =
+    checkUrl instanceof URL
+      ? checkUrl
+      : new URL(checkUrl.startsWith('//') ? `http:${checkUrl}` : checkUrl)
   let pathname
 
   while (pathname !== '/' && parsed.pathname !== pathname) {
@@ -47,10 +60,10 @@ function getRegistryAuthInfo (checkUrl, options) {
     if (!options.recursive) {
       return /\/$/.test(checkUrl)
         ? undefined
-        : getRegistryAuthInfo(url.resolve(checkUrl, '.'), options)
+        : getRegistryAuthInfo(new URL('./', parsed), options)
     }
 
-    parsed.pathname = url.resolve(normalizePath(pathname), '..') || '/'
+    parsed.pathname = urlResolve(normalizePath(pathname), '..') || '/'
   }
 
   return undefined
