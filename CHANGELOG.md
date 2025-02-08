@@ -2,6 +2,12 @@
 
 All notable changes will be documented in this file.
 
+## [5.1.0] - 2025-02-07
+
+### Changes
+
+- Use WHATWG URL instead of legacy APIs, silencing errors in Bun etc (fisker Cheung)
+
 ## [5.0.3] - 2024-11-27
 
 ### Changes
@@ -28,7 +34,6 @@ All notable changes will be documented in this file.
 
 - Replace outdated `rc` dependency with `@pnpm/npm-conf` (Kyler Nelson)
 - Fix incorrect usage information in readme (Kyler Nelson)
-
 
 ## [4.2.2] - 2022-06-16
 
@@ -132,9 +137,9 @@ All notable changes will be documented in this file.
 - The result format of the output changed from a simple string to an object which contains the token type
 
 ```js
-  // before: returns 'tokenString'
-  // after: returns {token: 'tokenString', type: 'Bearer'}
-  getAuthToken()
+// before: returns 'tokenString'
+// after: returns {token: 'tokenString', type: 'Bearer'}
+getAuthToken();
 ```
 
 ## [2.1.1] - 2016-07-10
