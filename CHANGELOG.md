@@ -2,6 +2,12 @@
 
 All notable changes will be documented in this file.
 
+## [5.1.1] - 2026-01-15
+
+### Changes
+
+- Upgrade @pnpm/npm-conf to latest version (Phill Garrett)
+
 ## [5.1.0] - 2025-02-07
 
 ### Changes
