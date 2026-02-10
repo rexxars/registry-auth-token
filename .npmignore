@@ -1,7 +1,0 @@
-.editorconfig
-.eslintignore
-.eslintrc
-.github
-npm-debug.log
-coverage
-test

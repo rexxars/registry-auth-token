@@ -1,15 +1,13 @@
-# Logs
+logs
 *.log
-
-# Compiled files
-lib
-
-# Coverage directory used by tools like istanbul
+pids
+*.pid
+*.seed
+lib-cov
 coverage
-
-# Dependency directories
+.grunt
+.lock-wscript
+build/Release
 node_modules
-
-# Yarn lockfile
+vendor
 yarn.lock
-

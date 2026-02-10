@@ -2,19 +2,29 @@
   "name": "registry-auth-token",
   "version": "5.1.1",
   "description": "Get the auth token set for an npm registry (if any)",
-  "main": "index.js",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
   "scripts": {
-    "test": "mocha --require test/global-hooks.js",
-    "posttest": "standard",
-    "coverage": "istanbul cover _mocha"
+    "test": "node --test test/test.js",
+    "posttest": "eslint ."
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/rexxars/registry-auth-token.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=22.12"
   },
+  "files": [
+    "src"
+  ],
   "keywords": [
     "npm",
     "conf",
@@ -35,14 +45,14 @@
     "@pnpm/npm-conf": "^3.0.2"
   },
   "devDependencies": {
-    "istanbul": "^0.4.2",
-    "mocha": "^10.0.0",
-    "require-uncached": "^1.0.2",
-    "standard": "^12.0.1"
-  },
-  "standard": {
-    "ignore": [
-      "coverage/**"
-    ]
+    "@eslint/js": "^9.0.0",
+    "@sanity/semantic-release-preset": "^6.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-perfectionist": "^5.5.0",
+    "eslint-plugin-unicorn": "^62.0.0",
+    "globals": "^16.0.0",
+    "prettier": "^3.8.1",
+    "semantic-release": "^25.0.3"
   }
 }
