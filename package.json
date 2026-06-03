@@ -2,47 +2,54 @@
   "name": "registry-auth-token",
   "version": "5.1.1",
   "description": "Get the auth token set for an npm registry (if any)",
-  "main": "index.js",
-  "scripts": {
-    "test": "mocha --require test/global-hooks.js",
-    "posttest": "standard",
-    "coverage": "istanbul cover _mocha"
+  "keywords": [
+    "auth",
+    "authtoken",
+    "conf",
+    "config",
+    "npm",
+    "npmconf",
+    "registry",
+    "token"
+  ],
+  "homepage": "https://github.com/rexxars/registry-auth-token#readme",
+  "bugs": {
+    "url": "https://github.com/rexxars/registry-auth-token/issues"
   },
+  "license": "MIT",
+  "author": "Espen Hovlandsdal <espen@hovlandsdal.com>",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/rexxars/registry-auth-token.git"
   },
-  "engines": {
-    "node": ">=14"
-  },
-  "keywords": [
-    "npm",
-    "conf",
-    "config",
-    "npmconf",
-    "registry",
-    "auth",
-    "token",
-    "authtoken"
+  "files": [
+    "src"
   ],
-  "author": "Espen Hovlandsdal <espen@hovlandsdal.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/rexxars/registry-auth-token/issues"
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
   },
-  "homepage": "https://github.com/rexxars/registry-auth-token#readme",
+  "scripts": {
+    "format": "oxfmt",
+    "lint": "oxlint",
+    "test": "node --test test/test.js",
+    "posttest": "oxlint"
+  },
   "dependencies": {
     "@pnpm/npm-conf": "^3.0.2"
   },
   "devDependencies": {
-    "istanbul": "^0.4.2",
-    "mocha": "^10.0.0",
-    "require-uncached": "^1.0.2",
-    "standard": "^12.0.1"
+    "@sanity/semantic-release-preset": "^6.0.0",
+    "oxfmt": "^0.53.0",
+    "oxlint": "^1.68.0",
+    "semantic-release": "^25.0.3"
   },
-  "standard": {
-    "ignore": [
-      "coverage/**"
-    ]
+  "engines": {
+    "node": ">=22.12"
   }
 }

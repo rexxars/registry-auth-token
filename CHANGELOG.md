@@ -145,7 +145,7 @@ All notable changes will be documented in this file.
 ```js
 // before: returns 'tokenString'
 // after: returns {token: 'tokenString', type: 'Bearer'}
-getAuthToken();
+getAuthToken()
 ```
 
 ## [2.1.1] - 2016-07-10

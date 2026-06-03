@@ -4,6 +4,8 @@
 
 Get the auth token set for an npm registry from `.npmrc`. Also allows fetching the configured registry URL for a given npm scope.
 
+Note: This module is ESM-only and requires Node.js 22.12 or higher. For a version that uses CommonJS, use the `5.x` range.
+
 ## Installing
 
 ```
@@ -15,38 +17,41 @@ npm install --save registry-auth-token
 Returns an object containing `token` and `type`, or `undefined` if no token can be found. `type` can be either `Bearer` or `Basic`.
 
 ```js
-const getAuthToken = require('registry-auth-token')
-const getRegistryUrl = require('registry-auth-token/registry-url')
+import {getRegistryAuthToken, getRegistryUrl} from 'registry-auth-token'
 
 // Get auth token and type for default `registry` set in `.npmrc`
-console.log(getAuthToken()) // {token: 'someToken', type: 'Bearer'}
+console.log(getRegistryAuthToken()) // {token: 'someToken', type: 'Bearer'}
 
 // Get auth token for a specific registry URL
-console.log(getAuthToken('//registry.foo.bar'))
+console.log(getRegistryAuthToken('//registry.foo.bar'))
 
 // Find the registry auth token for a given URL (with deep path):
 // If registry is at `//some.host/registry`
 // URL passed is `//some.host/registry/deep/path`
 // Will find token the closest matching path; `//some.host/registry`
-console.log(getAuthToken('//some.host/registry/deep/path', {recursive: true}))
+console.log(getRegistryAuthToken('//some.host/registry/deep/path', {recursive: true}))
 
 // Use the npm config that is passed in
-console.log(getAuthToken('//registry.foo.bar', {
-  npmrc: {
-    'registry': 'http://registry.foo.bar',
-    '//registry.foo.bar/:_authToken': 'qar'
-  }
-}))
+console.log(
+  getRegistryAuthToken('//registry.foo.bar', {
+    npmrc: {
+      registry: 'http://registry.foo.bar',
+      '//registry.foo.bar/:_authToken': 'qar',
+    },
+  }),
+)
 
 // Find the configured registry url for scope `@foobar`.
 // Falls back to the global registry if not defined.
 console.log(getRegistryUrl('@foobar'))
 
 // Use the npm config that is passed in
-console.log(getRegistryUrl('http://registry.foobar.eu/', {
-  'registry': 'http://registry.foobar.eu/',
-  '//registry.foobar.eu/:_authToken': 'qar'
-}))
+console.log(
+  getRegistryUrl('http://registry.foobar.eu/', {
+    registry: 'http://registry.foobar.eu/',
+    '//registry.foobar.eu/:_authToken': 'qar',
+  }),
+)
 ```
 
 ## Return value
