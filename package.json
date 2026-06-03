@@ -2,6 +2,29 @@
   "name": "registry-auth-token",
   "version": "5.1.1",
   "description": "Get the auth token set for an npm registry (if any)",
+  "keywords": [
+    "auth",
+    "authtoken",
+    "conf",
+    "config",
+    "npm",
+    "npmconf",
+    "registry",
+    "token"
+  ],
+  "homepage": "https://github.com/rexxars/registry-auth-token#readme",
+  "bugs": {
+    "url": "https://github.com/rexxars/registry-auth-token/issues"
+  },
+  "license": "MIT",
+  "author": "Espen Hovlandsdal <espen@hovlandsdal.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/rexxars/registry-auth-token.git"
+  },
+  "files": [
+    "src"
+  ],
   "type": "module",
   "main": "src/index.js",
   "types": "src/index.d.ts",
@@ -12,47 +35,21 @@
     }
   },
   "scripts": {
+    "format": "oxfmt",
+    "lint": "oxlint",
     "test": "node --test test/test.js",
-    "posttest": "eslint ."
+    "posttest": "oxlint"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/rexxars/registry-auth-token.git"
-  },
-  "engines": {
-    "node": ">=22.12"
-  },
-  "files": [
-    "src"
-  ],
-  "keywords": [
-    "npm",
-    "conf",
-    "config",
-    "npmconf",
-    "registry",
-    "auth",
-    "token",
-    "authtoken"
-  ],
-  "author": "Espen Hovlandsdal <espen@hovlandsdal.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/rexxars/registry-auth-token/issues"
-  },
-  "homepage": "https://github.com/rexxars/registry-auth-token#readme",
   "dependencies": {
     "@pnpm/npm-conf": "^3.0.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.0.0",
     "@sanity/semantic-release-preset": "^6.0.0",
-    "eslint": "^9.0.0",
-    "eslint-config-prettier": "^10.0.0",
-    "eslint-plugin-perfectionist": "^5.5.0",
-    "eslint-plugin-unicorn": "^62.0.0",
-    "globals": "^16.0.0",
-    "prettier": "^3.8.1",
+    "oxfmt": "^0.53.0",
+    "oxlint": "^1.68.0",
     "semantic-release": "^25.0.3"
+  },
+  "engines": {
+    "node": ">=22.12"
   }
 }

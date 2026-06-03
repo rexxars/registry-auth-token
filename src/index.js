@@ -75,7 +75,7 @@ function getRegistryAuthInfo(checkUrl, options) {
     }
 
     if (!options.recursive) {
-      return /\/$/.test(checkUrl)
+      return String(checkUrl).endsWith('/')
         ? undefined
         : getRegistryAuthInfo(new URL('./', parsed), options)
     }
